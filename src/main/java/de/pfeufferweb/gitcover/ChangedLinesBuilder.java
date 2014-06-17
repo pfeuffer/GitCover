@@ -2,6 +2,7 @@ package de.pfeufferweb.gitcover;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.ObjectStream;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
@@ -29,7 +31,7 @@ public class ChangedLinesBuilder
 
     public static void main(String[] args) throws Exception
     {
-        new ChangedLinesBuilder("w:/S42_Production").build();
+        new ChangedLinesBuilder("w:/S42_Production").build("origin/integration/05.02.02");
     }
 
     public ChangedLinesBuilder(String repoFolder) throws Exception
@@ -37,13 +39,13 @@ public class ChangedLinesBuilder
         this.repository = new RepositoryBuilder().findGitDir(new File(repoFolder)).build();
     }
 
-    public ChangedLines build() throws Exception
+    public ChangedLines build(String revision) throws Exception
     {
         ChangedLines changedLines = new ChangedLines();
         Git git = new Git(repository);
 
         ObjectId headId = repository.resolve("HEAD^{tree}");
-        ObjectId oldId = repository.resolve("origin/integration/05.02.02^{tree}");
+        ObjectId oldId = repository.resolve(revision + "^{tree}");
 
         ObjectReader reader = repository.newObjectReader();
 
@@ -56,14 +58,44 @@ public class ChangedLinesBuilder
 
         for (DiffEntry diff : diffs)
         {
-            if (diff.getChangeType() == ChangeType.MODIFY && diff.getNewPath().endsWith(".java"))
+            boolean isRelevantFile = diff.getNewPath().endsWith(".java");
+            if (isRelevantFile)
             {
-                System.out.println("diffs in " + diff.getNewPath());
-                Collection<Integer> lines = process(diff);
-                changedLines.addFile(diff.getNewPath(), lines);
+                if (isModified(diff))
+                {
+                    System.out.println("diffs in " + diff.getNewPath());
+                    Collection<Integer> lines = process(diff);
+                    changedLines.addFile(diff.getNewPath(), lines);
+                }
+                else if (isAdd(diff))
+                {
+                    System.out.println("new " + diff.getNewPath());
+                    Collection<Integer> lines = createLines(load(diff.getNewId()));
+                    changedLines.addFile(diff.getNewPath(), lines);
+                }
             }
         }
         return changedLines;
+    }
+
+    private boolean isModified(DiffEntry diff)
+    {
+        return diff.getChangeType() == ChangeType.MODIFY;
+    }
+
+    private boolean isAdd(DiffEntry diff)
+    {
+        return diff.getChangeType() == ChangeType.ADD;
+    }
+
+    private Collection<Integer> createLines(List<String> content)
+    {
+        Collection<Integer> lines = new ArrayList<Integer>();
+        for (int i = 1; i <= content.size(); ++i)
+        {
+            lines.add(i);
+        }
+        return lines;
     }
 
     private Collection<Integer> process(DiffEntry diff) throws Exception
@@ -72,7 +104,12 @@ public class ChangedLinesBuilder
         Collection<Integer> lines = new HashSet<Integer>();
         for (Delta delta : patch.getDeltas())
         {
-            lines.add(delta.getOriginal().getPosition());
+            int initialPosition = delta.getRevised().getPosition();
+            int diffLength = delta.getRevised().getLines().size();
+            for (int i = 1; i <= diffLength; ++i)
+            {
+                lines.add(initialPosition + i);
+            }
         }
         return lines;
     }
@@ -81,8 +118,13 @@ public class ChangedLinesBuilder
     {
         ObjectLoader loader = repository.open(objectId.toObjectId());
 
-        // and then one can use either
-        BufferedReader in = new BufferedReader(new InputStreamReader(loader.openStream()));
+        ObjectStream stream = loader.openStream();
+        return load(stream);
+    }
+
+    private List<String> load(ObjectStream stream) throws IOException
+    {
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
         String line;
         List<String> lines = new ArrayList<String>();
         while ((line = in.readLine()) != null)
