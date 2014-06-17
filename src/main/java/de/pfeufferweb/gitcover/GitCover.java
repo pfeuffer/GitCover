@@ -27,7 +27,11 @@ public class GitCover
                 {
                     if (lineCoverage.containsKey(line))
                     {
-                        System.out.println(line + " > " + lineCoverage.get(line));
+                        System.out.println("C: " + line + " > " + lineCoverage.get(line));
+                    }
+                    else
+                    {
+                        System.out.println("I: " + line);
                     }
                 }
             }
@@ -35,7 +39,7 @@ public class GitCover
             {
                 for (int line : changedLines.getChangedLines(changedFile))
                 {
-                    System.out.println(line + " > " + 0);
+                    System.out.println("N: " + line);
                 }
             }
         }
