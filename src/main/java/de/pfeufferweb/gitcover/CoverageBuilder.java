@@ -25,12 +25,6 @@ import org.xml.sax.SAXException;
 
 public class CoverageBuilder
 {
-    public static void main(String[] args) throws Exception
-    {
-        File file = new File("w:/S42_Production/Source/");
-        Coverage overall = new CoverageBuilder().computeAll(file);
-    }
-
     public Coverage computeAll(File directory) throws Exception
     {
         Coverage overallCoverage = new Coverage();

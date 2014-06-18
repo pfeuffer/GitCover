@@ -29,11 +29,6 @@ public class ChangedLinesBuilder
 {
     private final Repository repository;
 
-    public static void main(String[] args) throws Exception
-    {
-        new ChangedLinesBuilder("w:/S42_Production").build("origin/integration/05.02.02");
-    }
-
     public ChangedLinesBuilder(String repoFolder) throws Exception
     {
         this.repository = new RepositoryBuilder().findGitDir(new File(repoFolder)).build();
