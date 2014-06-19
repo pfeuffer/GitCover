@@ -89,9 +89,9 @@ public class GitCover
         out.println("</html>");
     }
 
-    private void writeResutlLine(int line, String content, String c, String color, String type)
+    private void writeResutlLine(int line, String content, String c, String status, String type)
     {
-        out.println("<tr class='" + color + "'><td>" + type + "</td><td>" + line + "</td><td>" + c
+        out.println("<tr class='" + status + "'><td>" + type + "</td><td>" + line + "</td><td>" + c
                 + "</td><td style='font-family: monospace;'>" + fixWhitespaces(content) + "</td></tr>");
     }
 
