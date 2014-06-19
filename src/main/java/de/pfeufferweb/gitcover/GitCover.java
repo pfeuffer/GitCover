@@ -40,15 +40,12 @@ public class GitCover
                 {
                     if (lineCoverage.containsKey(line))
                     {
-                        System.out.println("<tr style='background: " + (lineCoverage.get(line) == 0 ? "red" : "green")
-                                + ";'><td>C</td><td>" + line + "</td><td>" + lineCoverage.get(line)
-                                + "</td><td style='font-family: monospace;'>" + changedLines.getLine(changedFile, line)
-                                + "</td></tr>");
+                        writeResutlLine(line, changedLines.getLine(changedFile, line), lineCoverage.get(line)
+                                .toString(), lineCoverage.get(line) == 0 ? "red" : "green", "C");
                     }
                     else
                     {
-                        System.out.println("<tr><td>I</td><td>" + line + "</td><td>-</td><td>"
-                                + changedLines.getLine(changedFile, line) + "</td></tr>");
+                        writeResutlLine(line, changedLines.getLine(changedFile, line), "-", "white", "I");
                     }
                 }
             }
@@ -56,14 +53,18 @@ public class GitCover
             {
                 for (int line : lines)
                 {
-                    System.out.println("<tr style='background: 'orange'><td>N</td><td>" + line
-                            + "</td><td>0</td><td style='font-family: monospace;'>"
-                            + changedLines.getLine(changedFile, line) + "</td></tr>");
+                    writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "orange", "N");
                 }
             }
             System.out.println("</table>");
         }
         System.out.println("</body>");
         System.out.println("</html>");
+    }
+
+    private static void writeResutlLine(int line, String content, String c, String color, String type)
+    {
+        System.out.println("<tr style='background: " + color + ";'><td>" + type + "</td><td>" + line + "</td><td>" + c
+                + "</td><td style='font-family: monospace;'>" + content + "</td></tr>");
     }
 }
