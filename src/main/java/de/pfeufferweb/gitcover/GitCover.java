@@ -33,7 +33,9 @@ public class GitCover
         out.println("<html>");
         out.println("<!-- Style by http://quhno.internetstrahlen.de/myopera/csstests/collapsible-paragraph.html -->");
         out.println("<style type='text/css'>");
-        out.println("a.exp {display:block;margin: 1em 0 0 0;text-decoration:none;border:1px solid black;border-radius:4px;background:#CDF;padding:10px;}");
+        out.println("a.exp {display:block;margin: 1em 0 0 0;text-decoration:none;border:1px solid black;border-radius:4px;padding:10px;}");
+        out.println("a.ignored {background:#CDF;}");
+        out.println("a.coverage {background:#FDC;}");
         out.println("a.exp::after {content:\"»\";float:right;}");
         out.println("a.exp:focus {border-width: 1px 1px 0 1px;border-radius:4px 4px 0 0}");
         out.println("a.exp + div {display:none;}");
@@ -42,10 +44,10 @@ public class GitCover
         out.println("div.exp *{padding:0.3em 10px 0em 10px;}");
         out.println("div.exp table:last-child::after {content:\"«\";float:right;}");
         out.println("div.exp *:first-child {margin-top:0;}");
-        out.println(".notCovered {background: red;}");
-        out.println(".covered {background: green;}");
-        out.println(".ignored {background: white;}");
-        out.println(".notChecked {background: orange;}");
+        out.println("tr.notCovered {background: red;}");
+        out.println("tr.covered {background: green;}");
+        out.println("tr.ignored {background: white;}");
+        out.println("tr.notChecked {background: orange;}");
         out.println("</style>");
         ChangedLines changedLines = new ChangedLinesBuilder(directory).build(branch);
         Coverage coverage = new CoverageBuilder().computeAll(new File(directory));
@@ -55,14 +57,13 @@ public class GitCover
         sort(fileNames);
         for (String changedFile : fileNames)
         {
-            out.println("<a class='exp' href='#url'><h2>" + changedFile + "</h2></a>");
-            out.println("<div class='exp'><table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
 
             List<Integer> lines = new ArrayList<Integer>(changedLines.getChangedLines(changedFile));
             sort(lines);
             try
             {
                 Map<Integer, Integer> lineCoverage = coverage.getCoverage(changedFile);
+                writeHeader(changedFile, "coverage");
                 for (int line : lines)
                 {
                     if (lineCoverage.containsKey(line))
@@ -78,6 +79,7 @@ public class GitCover
             }
             catch (NoSuchElementException e)
             {
+                writeHeader(changedFile, "ignored");
                 for (int line : lines)
                 {
                     writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "notChecked", "N");
@@ -87,6 +89,12 @@ public class GitCover
         }
         out.println("</body>");
         out.println("</html>");
+    }
+
+    private void writeHeader(String changedFile, String type)
+    {
+        out.println("<a class='exp " + type + "' href='#url'><h2>" + changedFile + "</h2></a>");
+        out.println("<div class='exp'><table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
     }
 
     private void writeResutlLine(int line, String content, String c, String status, String type)
