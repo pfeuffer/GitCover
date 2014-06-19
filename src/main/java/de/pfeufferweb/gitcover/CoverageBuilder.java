@@ -66,7 +66,6 @@ public class CoverageBuilder
 
     public Coverage compute(File file) throws Exception
     {
-        System.out.println("taking coverage from " + file);
         Coverage result = new Coverage();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();

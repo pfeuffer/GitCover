@@ -58,13 +58,11 @@ public class ChangedLinesBuilder
             {
                 if (isModified(diff))
                 {
-                    System.out.println("diffs in " + diff.getNewPath());
                     Map<Integer, String> lines = process(diff);
                     changedLines.addFile(diff.getNewPath(), lines);
                 }
                 else if (isAdd(diff))
                 {
-                    System.out.println("new " + diff.getNewPath());
                     Map<Integer, String> lines = createLines(load(diff.getNewId()));
                     changedLines.addFile(diff.getNewPath(), lines);
                 }
