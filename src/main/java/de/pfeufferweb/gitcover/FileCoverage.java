@@ -44,7 +44,8 @@ class FileCoverage
     @Override
     public String toString()
     {
-        return changesLines + " Zeilen geändert, Testabdeckung: " + getCoverage() + "%";
+        return changesLines + " Zeile" + (changesLines == 1 ? "" : "n") + " geändert, " + relevantLines + " Zeile"
+                + (relevantLines == 1 ? "" : "n") + " relevant" + ", Testabdeckung: " + getCoverage() + "%";
     }
 
     int getCoverage()

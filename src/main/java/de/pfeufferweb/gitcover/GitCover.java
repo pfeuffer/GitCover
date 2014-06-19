@@ -54,6 +54,7 @@ public class GitCover
         out.println("<html>");
         out.println("<!-- Style by http://quhno.internetstrahlen.de/myopera/csstests/collapsible-paragraph.html -->");
         out.println("<style type='text/css'>");
+        out.println("h2 {margin: 0 0 0 0;}");
         out.println("a.exp {display:block;margin: 1em 0 0 0;text-decoration:none;border:1px solid black;border-radius:4px;padding:10px;}");
         out.println("a.ignored {background:#CDF;}");
         out.println("a.allCovered {background:#CFC;}");
@@ -66,8 +67,8 @@ public class GitCover
         out.println("div.exp *{padding:0.3em 10px 0em 10px;}");
         out.println("div.exp table:last-child::after {content:\"«\";float:right;}");
         out.println("div.exp *:first-child {margin-top:0;}");
-        out.println("tr.notCovered {background: red;}");
-        out.println("tr.covered {background: green;}");
+        out.println("tr.notCovered {background: orangered;}");
+        out.println("tr.covered {background: lightgreen;}");
         out.println("tr.ignored {background: white;}");
         out.println("tr.notChecked {background: orange;}");
         out.println("</style>");
@@ -96,11 +97,11 @@ public class GitCover
                     if (lineCoverage.containsKey(line))
                     {
                         writeResutlLine(line, changedLines.getLine(changedFile, line), lineCoverage.get(line)
-                                .toString(), lineCoverage.get(line) == 0 ? "notCovered" : "covered", "C");
+                                .toString(), lineCoverage.get(line) == 0 ? "notCovered" : "covered");
                     }
                     else
                     {
-                        writeResutlLine(line, changedLines.getLine(changedFile, line), "-", "ignored", "I");
+                        writeResutlLine(line, changedLines.getLine(changedFile, line), "-", "ignored");
                     }
                 }
             }
@@ -109,7 +110,7 @@ public class GitCover
                 writeHeader(changedFile, "ignored", "nicht im Test");
                 for (int line : lines)
                 {
-                    writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "notChecked", "N");
+                    writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "notChecked");
                 }
             }
             out.println("</table></div>");
@@ -133,12 +134,12 @@ public class GitCover
     private void writeHeader(String changedFile, String type, String label)
     {
         out.println("<a class='exp " + type + "' href='#url'><h2>" + changedFile + "</h2>" + label + "</a>");
-        out.println("<div class='exp'><table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
+        out.println("<div class='exp'><table><tr><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
     }
 
-    private void writeResutlLine(int line, String content, String c, String status, String type)
+    private void writeResutlLine(int line, String content, String c, String status)
     {
-        out.println("<tr class='" + status + "'><td>" + type + "</td><td>" + line + "</td><td>" + c
+        out.println("<tr class='" + status + "'><td>" + line + "</td><td>" + c
                 + "</td><td style='font-family: monospace;'>" + fixWhitespaces(content) + "</td></tr>");
     }
 
