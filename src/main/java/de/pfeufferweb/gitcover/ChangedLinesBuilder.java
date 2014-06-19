@@ -1,10 +1,6 @@
 package de.pfeufferweb.gitcover;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,18 +108,6 @@ public class ChangedLinesBuilder
         ObjectLoader loader = repository.open(objectId.toObjectId());
 
         ObjectStream stream = loader.openStream();
-        return load(stream);
-    }
-
-    private List<String> load(ObjectStream stream) throws IOException
-    {
-        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-        String line;
-        List<String> lines = new ArrayList<String>();
-        while ((line = in.readLine()) != null)
-        {
-            lines.add(line);
-        }
-        return lines;
+        return new FileLoader(stream).load();
     }
 }

@@ -3,11 +3,14 @@ package de.pfeufferweb.gitcover;
 import static java.util.Collections.sort;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 public class GitCover
 {
@@ -18,14 +21,32 @@ public class GitCover
             args = new String[]
             { "w:/S42_Production", "origin/integration/05.02.00" };
         }
-        new GitCover(System.out).process(args[0], args[1]);
+        GitCover gitCover = new GitCover(System.out);
+        if (args.length > 2)
+        {
+            gitCover.ignore(new File(args[2]));
+        }
+        gitCover.process(args[0], args[1]);
     }
 
     private final PrintStream out;
+    private final Collection<Pattern> ignore;
 
     public GitCover(PrintStream out)
     {
         this.out = out;
+        this.ignore = new ArrayList<Pattern>();
+    }
+
+    private void ignore(File file) throws Exception
+    {
+        for (String pattern : new FileLoader(new FileInputStream(file)).load())
+        {
+            if (pattern.trim().length() > 0)
+            {
+                ignore.add(Pattern.compile(".*" + pattern + ".*"));
+            }
+        }
     }
 
     private void process(String directory, String branch) throws Exception
@@ -57,7 +78,10 @@ public class GitCover
         sort(fileNames);
         for (String changedFile : fileNames)
         {
-
+            if (isIgnored(changedFile))
+            {
+                continue;
+            }
             List<Integer> lines = new ArrayList<Integer>(changedLines.getChangedLines(changedFile));
             sort(lines);
             try
@@ -89,6 +113,18 @@ public class GitCover
         }
         out.println("</body>");
         out.println("</html>");
+    }
+
+    private boolean isIgnored(String changedFile)
+    {
+        for (Pattern pattern : this.ignore)
+        {
+            if (pattern.matcher(changedFile).matches())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void writeHeader(String changedFile, String type)
