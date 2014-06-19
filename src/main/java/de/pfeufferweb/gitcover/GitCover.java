@@ -40,7 +40,7 @@ public class GitCover
                 {
                     if (lineCoverage.containsKey(line))
                     {
-                        System.out.println("<tr style='background=" + (lineCoverage.get(line) == 0 ? "red" : "green")
+                        System.out.println("<tr style='background: " + (lineCoverage.get(line) == 0 ? "red" : "green")
                                 + ";'><td>C</td><td>" + line + "</td><td>" + lineCoverage.get(line)
                                 + "</td><td></td></tr>");
                     }
