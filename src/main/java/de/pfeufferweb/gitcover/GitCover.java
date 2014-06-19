@@ -42,6 +42,10 @@ public class GitCover
         out.println("div.exp *{padding:0.3em 10px 0em 10px;}");
         out.println("div.exp table:last-child::after {content:\"«\";float:right;}");
         out.println("div.exp *:first-child {margin-top:0;}");
+        out.println(".notCovered {background: red;}");
+        out.println(".covered {background: green;}");
+        out.println(".ignored {background: white;}");
+        out.println(".notChecked {background: orange;}");
         out.println("</style>");
         ChangedLines changedLines = new ChangedLinesBuilder(directory).build(branch);
         Coverage coverage = new CoverageBuilder().computeAll(new File(directory));
@@ -64,11 +68,11 @@ public class GitCover
                     if (lineCoverage.containsKey(line))
                     {
                         writeResutlLine(line, changedLines.getLine(changedFile, line), lineCoverage.get(line)
-                                .toString(), lineCoverage.get(line) == 0 ? "red" : "green", "C");
+                                .toString(), lineCoverage.get(line) == 0 ? "notCovered" : "covered", "C");
                     }
                     else
                     {
-                        writeResutlLine(line, changedLines.getLine(changedFile, line), "-", "white", "I");
+                        writeResutlLine(line, changedLines.getLine(changedFile, line), "-", "ignored", "I");
                     }
                 }
             }
@@ -76,7 +80,7 @@ public class GitCover
             {
                 for (int line : lines)
                 {
-                    writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "orange", "N");
+                    writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "notChecked", "N");
                 }
             }
             out.println("</table></div>");
@@ -87,7 +91,7 @@ public class GitCover
 
     private void writeResutlLine(int line, String content, String c, String color, String type)
     {
-        out.println("<tr style='background: " + color + ";'><td>" + type + "</td><td>" + line + "</td><td>" + c
+        out.println("<tr class='" + color + "'><td>" + type + "</td><td>" + line + "</td><td>" + c
                 + "</td><td style='font-family: monospace;'>" + fixWhitespaces(content) + "</td></tr>");
     }
 
