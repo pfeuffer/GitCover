@@ -56,7 +56,8 @@ public class GitCover
         out.println("<style type='text/css'>");
         out.println("a.exp {display:block;margin: 1em 0 0 0;text-decoration:none;border:1px solid black;border-radius:4px;padding:10px;}");
         out.println("a.ignored {background:#CDF;}");
-        out.println("a.coverage {background:#FDC;}");
+        out.println("a.allCovered {background:#CFC;}");
+        out.println("a.coverageMissing {background:#FDC;}");
         out.println("a.exp::after {content:\"»\";float:right;}");
         out.println("a.exp:focus {border-width: 1px 1px 0 1px;border-radius:4px 4px 0 0}");
         out.println("a.exp + div {display:none;}");
@@ -87,7 +88,9 @@ public class GitCover
             try
             {
                 Map<Integer, Integer> lineCoverage = coverage.getCoverage(changedFile);
-                writeHeader(changedFile, "coverage");
+                FileCoverage fileCoverage = FileCoverage.buildFrom(lineCoverage, lines);
+                writeHeader(changedFile, fileCoverage.getCoverage() >= 80 ? "allCovered" : "coverageMissing",
+                        fileCoverage.toString());
                 for (int line : lines)
                 {
                     if (lineCoverage.containsKey(line))
@@ -103,7 +106,7 @@ public class GitCover
             }
             catch (NoSuchElementException e)
             {
-                writeHeader(changedFile, "ignored");
+                writeHeader(changedFile, "ignored", "nicht im Test");
                 for (int line : lines)
                 {
                     writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "notChecked", "N");
@@ -127,9 +130,9 @@ public class GitCover
         return false;
     }
 
-    private void writeHeader(String changedFile, String type)
+    private void writeHeader(String changedFile, String type, String label)
     {
-        out.println("<a class='exp " + type + "' href='#url'><h2>" + changedFile + "</h2></a>");
+        out.println("<a class='exp " + type + "' href='#url'><h2>" + changedFile + "</h2>" + label + "</a>");
         out.println("<div class='exp'><table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
     }
 
