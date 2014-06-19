@@ -78,6 +78,7 @@ public class GitCover
         out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + branch + "</h1>");
         List<String> fileNames = new ArrayList<String>(changedLines.getFileNames());
         sort(fileNames);
+        OverallCoverage overall = new OverallCoverage();
         for (String changedFile : fileNames)
         {
             if (isIgnored(changedFile))
@@ -90,6 +91,7 @@ public class GitCover
             {
                 Map<Integer, Integer> lineCoverage = coverage.getCoverage(changedFile);
                 FileCoverage fileCoverage = FileCoverage.buildFrom(lineCoverage, lines);
+                overall.add(fileCoverage);
                 writeHeader(changedFile, fileCoverage.getCoverage() >= 80 ? "allCovered" : "coverageMissing",
                         fileCoverage.toString());
                 for (int line : lines)
@@ -115,6 +117,7 @@ public class GitCover
             }
             out.println("</table></div>");
         }
+        out.println("Durchschnittliche Abdeckung aller testrelevanten Änderungen: " + overall.getCoverage() + "%");
         out.println("</body>");
         out.println("</html>");
     }

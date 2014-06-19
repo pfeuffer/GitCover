@@ -5,9 +5,9 @@ import java.util.Map;
 
 class FileCoverage
 {
-    private final int changesLines;
-    private final int relevantLines;
-    private final int coveredLines;
+    final int changesLines;
+    final int relevantLines;
+    final int coveredLines;
 
     private FileCoverage(int changesLines, int relevantLines, int coveredLines)
     {
