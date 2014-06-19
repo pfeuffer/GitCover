@@ -31,6 +31,18 @@ public class GitCover
     private void process(String directory, String branch) throws Exception
     {
         out.println("<html>");
+        out.println("<!-- Style by http://quhno.internetstrahlen.de/myopera/csstests/collapsible-paragraph.html -->");
+        out.println("<style type='text/css'>");
+        out.println("a.exp {display:block;margin: 1em 0 0 0;text-decoration:none;border:1px solid black;border-radius:4px;background:#CDF;padding:10px;}");
+        out.println("a.exp::after {content:\"»\";float:right;}");
+        out.println("a.exp:focus {border-width: 1px 1px 0 1px;border-radius:4px 4px 0 0}");
+        out.println("a.exp + div {display:none;}");
+        out.println("a.exp:focus + div {display:block;border-width: 0 1px 1px 1px;border-style:solid; border-radius:0 0 4px 4px;border-color:black;}");
+        out.println("a.exp:focus::after {content:\"\";}");
+        out.println("div.exp *{padding:0.3em 10px 0em 10px;}");
+        out.println("div.exp table:last-child::after {content:\"«\";float:right;}");
+        out.println("div.exp *:first-child {margin-top:0;}");
+        out.println("</style>");
         ChangedLines changedLines = new ChangedLinesBuilder(directory).build(branch);
         Coverage coverage = new CoverageBuilder().computeAll(new File(directory));
         out.println("<body>");
@@ -39,9 +51,8 @@ public class GitCover
         sort(fileNames);
         for (String changedFile : fileNames)
         {
-            out.println("<p>");
-            out.println("<h2>" + changedFile + "</h2>");
-            out.println("<table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
+            out.println("<a class='exp' href='#url'><h2>" + changedFile + "</h2></a>");
+            out.println("<div class='exp'><table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
 
             List<Integer> lines = new ArrayList<Integer>(changedLines.getChangedLines(changedFile));
             sort(lines);
@@ -68,7 +79,7 @@ public class GitCover
                     writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "orange", "N");
                 }
             }
-            out.println("</table>");
+            out.println("</table></div>");
         }
         out.println("</body>");
         out.println("</html>");
