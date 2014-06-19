@@ -25,10 +25,11 @@ public class GitCover
         System.out.println(coverage.getFileNames());
         System.out.println("-->");
         System.out.println("<body>");
+        System.out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + args[1] + "</h1>");
         for (String changedFile : changedLines.getFileNames())
         {
             System.out.println("<p>");
-            System.out.println(changedFile);
+            System.out.println("<h2>" + changedFile + "</h2>");
             System.out.println("<table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
 
             List<Integer> lines = new ArrayList<Integer>(changedLines.getChangedLines(changedFile));
