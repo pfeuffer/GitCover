@@ -77,6 +77,11 @@ public class GitCover
     private void writeResutlLine(int line, String content, String c, String color, String type)
     {
         out.println("<tr style='background: " + color + ";'><td>" + type + "</td><td>" + line + "</td><td>" + c
-                + "</td><td style='font-family: monospace;'>" + content + "</td></tr>");
+                + "</td><td style='font-family: monospace;'>" + fixWhitespaces(content) + "</td></tr>");
+    }
+
+    private String fixWhitespaces(String content)
+    {
+        return content.replaceAll("\t", " ").replaceAll(" ", "&nbsp;");
     }
 }
