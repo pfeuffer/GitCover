@@ -6,11 +6,13 @@ import java.util.Map;
 class FileCoverage
 {
     private final int changesLines;
+    private final int relevantLines;
     private final int coveredLines;
 
-    private FileCoverage(int changesLines, int coveredLines)
+    private FileCoverage(int changesLines, int relevantLines, int coveredLines)
     {
         this.changesLines = changesLines;
+        this.relevantLines = relevantLines;
         this.coveredLines = coveredLines;
     }
 
@@ -18,15 +20,20 @@ class FileCoverage
     {
         int changedLines = 0;
         int coveredLines = 0;
+        int relevantLines = 0;
         for (int line : lines)
         {
             ++changedLines;
-            if (lineCoverage.containsKey(line) && lineCoverage.get(line) > 0)
+            if (lineCoverage.containsKey(line))
             {
-                ++coveredLines;
+                ++relevantLines;
+                if (lineCoverage.get(line) > 0)
+                {
+                    ++coveredLines;
+                }
             }
         }
-        return new FileCoverage(changedLines, coveredLines);
+        return new FileCoverage(changedLines, relevantLines, coveredLines);
     }
 
     boolean completelyCovered()
@@ -42,6 +49,6 @@ class FileCoverage
 
     int getCoverage()
     {
-        return 100 * coveredLines / changesLines;
+        return relevantLines == 0 ? 100 : (100 * coveredLines / relevantLines);
     }
 }
