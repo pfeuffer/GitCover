@@ -3,6 +3,7 @@ package de.pfeufferweb.gitcover;
 import static java.util.Collections.sort;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,20 +18,30 @@ public class GitCover
             args = new String[]
             { "w:/S42_Production", "origin/integration/05.02.00" };
         }
-        System.out.println("<html>");
-        System.out.println("<!--");
-        ChangedLines changedLines = new ChangedLinesBuilder(args[0]).build(args[1]);
-        Coverage coverage = new CoverageBuilder().computeAll(new File(args[0]));
-        System.out.println(changedLines.getFileNames());
-        System.out.println(coverage.getFileNames());
-        System.out.println("-->");
-        System.out.println("<body>");
-        System.out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + args[1] + "</h1>");
-        for (String changedFile : changedLines.getFileNames())
+        new GitCover(System.out).process(args[0], args[1]);
+    }
+
+    private final PrintStream out;
+
+    public GitCover(PrintStream out)
+    {
+        this.out = out;
+    }
+
+    private void process(String directory, String branch) throws Exception
+    {
+        out.println("<html>");
+        ChangedLines changedLines = new ChangedLinesBuilder(directory).build(branch);
+        Coverage coverage = new CoverageBuilder().computeAll(new File(directory));
+        out.println("<body>");
+        out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + branch + "</h1>");
+        List<String> fileNames = new ArrayList<String>(changedLines.getFileNames());
+        sort(fileNames);
+        for (String changedFile : fileNames)
         {
-            System.out.println("<p>");
-            System.out.println("<h2>" + changedFile + "</h2>");
-            System.out.println("<table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
+            out.println("<p>");
+            out.println("<h2>" + changedFile + "</h2>");
+            out.println("<table><tr><th>Art</th><th>Zeile</th><th>Abdeckung</th><th>Code</th></tr>");
 
             List<Integer> lines = new ArrayList<Integer>(changedLines.getChangedLines(changedFile));
             sort(lines);
@@ -57,15 +68,15 @@ public class GitCover
                     writeResutlLine(line, changedLines.getLine(changedFile, line), "0", "orange", "N");
                 }
             }
-            System.out.println("</table>");
+            out.println("</table>");
         }
-        System.out.println("</body>");
-        System.out.println("</html>");
+        out.println("</body>");
+        out.println("</html>");
     }
 
-    private static void writeResutlLine(int line, String content, String c, String color, String type)
+    private void writeResutlLine(int line, String content, String c, String color, String type)
     {
-        System.out.println("<tr style='background: " + color + ";'><td>" + type + "</td><td>" + line + "</td><td>" + c
+        out.println("<tr style='background: " + color + ";'><td>" + type + "</td><td>" + line + "</td><td>" + c
                 + "</td><td style='font-family: monospace;'>" + content + "</td></tr>");
     }
 }
