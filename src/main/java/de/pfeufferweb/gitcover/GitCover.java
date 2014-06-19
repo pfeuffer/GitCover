@@ -16,10 +16,10 @@ public class GitCover
 {
     public static void main(String[] args) throws Exception
     {
-        if (args.length == 0)
+        if (args.length < 2)
         {
-            args = new String[]
-            { "w:/S42_Production", "origin/integration/05.02.00" };
+            System.out.println("usage: GitCover <git directory> <branch to compare with> [<ignore file>]");
+            return;
         }
         GitCover gitCover = new GitCover(System.out);
         if (args.length > 2)
