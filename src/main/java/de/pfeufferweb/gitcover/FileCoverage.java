@@ -45,7 +45,7 @@ class FileCoverage
     public String toString()
     {
         return changesLines + " Zeile" + (changesLines == 1 ? "" : "n") + " geändert, " + relevantLines + " Zeile"
-                + (relevantLines == 1 ? "" : "n") + " relevant" + ", Testabdeckung: " + getCoverage() + "%";
+                + (relevantLines == 1 ? "" : "n") + " testrelevant" + ", Testabdeckung: " + getCoverage() + "%";
     }
 
     int getCoverage()
