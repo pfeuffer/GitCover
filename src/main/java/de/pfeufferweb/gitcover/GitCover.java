@@ -42,11 +42,13 @@ public class GitCover
                     {
                         System.out.println("<tr style='background: " + (lineCoverage.get(line) == 0 ? "red" : "green")
                                 + ";'><td>C</td><td>" + line + "</td><td>" + lineCoverage.get(line)
-                                + "</td><td></td></tr>");
+                                + "</td><td style='font-family: monospace;'>" + changedLines.getLine(changedFile, line)
+                                + "</td></tr>");
                     }
                     else
                     {
-                        System.out.println("<tr><td>I</td><td>" + line + "</td><td>-</td><td></td></tr>");
+                        System.out.println("<tr><td>I</td><td>" + line + "</td><td>-</td><td>"
+                                + changedLines.getLine(changedFile, line) + "</td></tr>");
                     }
                 }
             }
@@ -54,8 +56,9 @@ public class GitCover
             {
                 for (int line : lines)
                 {
-                    System.out.println("<tr style='background='orange'><td>N</td><td>" + line
-                            + "</td><td>0</td><td></td></tr>");
+                    System.out.println("<tr style='background: 'orange'><td>N</td><td>" + line
+                            + "</td><td>0</td><td style='font-family: monospace;'>"
+                            + changedLines.getLine(changedFile, line) + "</td></tr>");
                 }
             }
             System.out.println("</table>");

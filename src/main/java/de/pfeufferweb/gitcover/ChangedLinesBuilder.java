@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -59,13 +59,13 @@ public class ChangedLinesBuilder
                 if (isModified(diff))
                 {
                     System.out.println("diffs in " + diff.getNewPath());
-                    Collection<Integer> lines = process(diff);
+                    Map<Integer, String> lines = process(diff);
                     changedLines.addFile(diff.getNewPath(), lines);
                 }
                 else if (isAdd(diff))
                 {
                     System.out.println("new " + diff.getNewPath());
-                    Collection<Integer> lines = createLines(load(diff.getNewId()));
+                    Map<Integer, String> lines = createLines(load(diff.getNewId()));
                     changedLines.addFile(diff.getNewPath(), lines);
                 }
             }
@@ -83,27 +83,27 @@ public class ChangedLinesBuilder
         return diff.getChangeType() == ChangeType.ADD;
     }
 
-    private Collection<Integer> createLines(List<String> content)
+    private Map<Integer, String> createLines(List<String> content)
     {
-        Collection<Integer> lines = new ArrayList<Integer>();
-        for (int i = 1; i <= content.size(); ++i)
+        Map<Integer, String> lines = new HashMap<Integer, String>();
+        for (int i = 0; i < content.size(); ++i)
         {
-            lines.add(i);
+            lines.put(i + 1, content.get(i));
         }
         return lines;
     }
 
-    private Collection<Integer> process(DiffEntry diff) throws Exception
+    private Map<Integer, String> process(DiffEntry diff) throws Exception
     {
         Patch patch = DiffUtils.diff(load(diff.getOldId()), load(diff.getNewId()));
-        Collection<Integer> lines = new HashSet<Integer>();
+        Map<Integer, String> lines = new HashMap<Integer, String>();
         for (Delta delta : patch.getDeltas())
         {
             int initialPosition = delta.getRevised().getPosition();
             int diffLength = delta.getRevised().getLines().size();
-            for (int i = 1; i <= diffLength; ++i)
+            for (int i = 0; i < diffLength; ++i)
             {
-                lines.add(initialPosition + i);
+                lines.put(initialPosition + i + 1, delta.getRevised().getLines().get(i).toString());
             }
         }
         return lines;
