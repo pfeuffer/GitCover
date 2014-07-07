@@ -52,6 +52,22 @@ public class GitCover
     private void process(String directory, String branch) throws Exception
     {
         out.println("<html>");
+        out.println("<script type='text/javascript'>");
+        out.println("function AppendColor(light) {\n" + "    $(\".dark\").each(function(i){\n"
+                + "      // get the RGB from existing elements\n"
+                + "        var color = $(this).css(\"background-color\");\n"
+                + "        color = color.replace(/[^0-9,]+/g, \"\");\n" + "        var red = color.split(\",\")[0];\n"
+                + "        var gre = color.split(\",\")[1];\n" + "        var blu = color.split(\",\")[2];\n" + "\n"
+                + "      // convert rgb to hsv\n" + "        var hsv = RgbToHsv(red,gre,blu);\n"
+                + "      // convert hsv to rgb modifing the `v` param\n"
+                + "        var rgb = HsvToRgb(hsv.h, hsv.s, light);\n" + "\n"
+                + "      // creates a new div and set the new background\n" + "      // then appends to the content\n"
+                + "        color = \"rgb(\" + rgb.r + \",\" + rgb.g + \",\" + rgb.b + \")\";\n"
+                + "        $(\"<div />\")\n" + "            .css(\"background\", color)\n"
+                + "            .attr(\"title\", color)\n" + "            .appendTo($(\".light\").parent());\n"
+                + "        $(\"<span />\").html(\" \").appendTo($(\".light\").parent())\n" + "    });\n"
+                + "    $(\"<br />\").appendTo($(\".light\").parent())\n" + "}\n" + "\n" + "// tested values\n");
+        out.println("</script>");
         out.println("<!-- Style by http://quhno.internetstrahlen.de/myopera/csstests/collapsible-paragraph.html -->");
         out.println("<style type='text/css'>");
         out.println("h2 {margin: 0 0 0 0;}");
@@ -92,8 +108,8 @@ public class GitCover
                 Map<Integer, Integer> lineCoverage = coverage.getCoverage(changedFile);
                 FileCoverage fileCoverage = FileCoverage.buildFrom(lineCoverage, lines);
                 overall.add(fileCoverage);
-                writeHeader(changedFile, fileCoverage.getCoverage() >= 80 ? "allCovered" : "coverageMissing",
-                        fileCoverage.toString());
+                writeHeader(changedFile, fileCoverage.changesLines == 0 ? "ignored"
+                        : fileCoverage.getCoverage() >= 80 ? "allCovered" : "coverageMissing", fileCoverage.toString());
                 for (int line : lines)
                 {
                     if (lineCoverage.containsKey(line))
