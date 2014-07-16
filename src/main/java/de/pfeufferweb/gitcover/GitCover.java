@@ -53,6 +53,8 @@ public class GitCover
     private void process(GCOptions options) throws Exception
     {
         out.println("<html>");
+        out.println("<head>");
+        out.println("<title>" + createTitle(options) + "</title>");
         out.println("<script type='text/javascript'>");
         out.println("function AppendColor(light) {\n" + "    $(\".dark\").each(function(i){\n"
                 + "      // get the RGB from existing elements\n"
@@ -92,8 +94,9 @@ public class GitCover
         ChangedLines changedLines = createChangedLinesBuilder(options, options.getRepository()).build(
                 options.getReference());
         Coverage coverage = new CoverageBuilder().computeAll(new File(options.getRepository()));
+        out.println("</head>");
         out.println("<body>");
-        out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + options.getReference() + "</h1>");
+        out.println("<h1>" + createTitle(options) + "</h1>");
         List<String> fileNames = new ArrayList<String>(changedLines.getFileNames());
         sort(fileNames);
         OverallCoverage overall = new OverallCoverage();
@@ -138,6 +141,11 @@ public class GitCover
         out.println("Durchschnittliche Abdeckung aller testrelevanten Änderungen: " + overall.getCoverage() + "%");
         out.println("</body>");
         out.println("</html>");
+    }
+
+    private String createTitle(GCOptions options)
+    {
+        return "Unittestabdeckung der Änderungen bzgl. Branch " + options.getReference();
     }
 
     private ChangedLinesBuilder createChangedLinesBuilder(GCOptions options, String directory) throws Exception
