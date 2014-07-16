@@ -16,17 +16,18 @@ public class GitCover
 {
     public static void main(String[] args) throws Exception
     {
-        if (args.length < 2)
+        GCOptions options = new GCOptions();
+        options.parse(args);
+        if (options.isFailed())
         {
-            System.out.println("usage: GitCover <git directory> <branch to compare with> [<ignore file>]");
             return;
         }
         GitCover gitCover = new GitCover(System.out);
-        if (args.length > 2)
+        if (options.hasIgnoreFile())
         {
-            gitCover.ignore(new File(args[2]));
+            gitCover.ignore(new File(options.getIgnoreFile()));
         }
-        gitCover.process(args[0], args[1]);
+        gitCover.process(options);
     }
 
     private final PrintStream out;
@@ -49,7 +50,7 @@ public class GitCover
         }
     }
 
-    private void process(String directory, String branch) throws Exception
+    private void process(GCOptions options) throws Exception
     {
         out.println("<html>");
         out.println("<script type='text/javascript'>");
@@ -88,10 +89,11 @@ public class GitCover
         out.println("tr.ignored {background: white;}");
         out.println("tr.notChecked {background: orange;}");
         out.println("</style>");
-        ChangedLines changedLines = new ChangedLinesBuilder(directory).build(branch);
-        Coverage coverage = new CoverageBuilder().computeAll(new File(directory));
+        ChangedLines changedLines = createChangedLinesBuilder(options, options.getRepository()).build(
+                options.getReference());
+        Coverage coverage = new CoverageBuilder().computeAll(new File(options.getRepository()));
         out.println("<body>");
-        out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + branch + "</h1>");
+        out.println("<h1>Unittestabdeckung der Änderungen bzgl. Branch " + options.getReference() + "</h1>");
         List<String> fileNames = new ArrayList<String>(changedLines.getFileNames());
         sort(fileNames);
         OverallCoverage overall = new OverallCoverage();
@@ -136,6 +138,14 @@ public class GitCover
         out.println("Durchschnittliche Abdeckung aller testrelevanten Änderungen: " + overall.getCoverage() + "%");
         out.println("</body>");
         out.println("</html>");
+    }
+
+    private ChangedLinesBuilder createChangedLinesBuilder(GCOptions options, String directory) throws Exception
+    {
+        ChangedLinesBuilder changedLinesBuilder = new ChangedLinesBuilder(directory);
+        changedLinesBuilder.setIncludeAdded(!options.isExcludeAdded());
+        changedLinesBuilder.setIncludeModified(!options.isExcludeModified());
+        return changedLinesBuilder;
     }
 
     private boolean isIgnored(String changedFile)

@@ -24,6 +24,8 @@ import difflib.Patch;
 public class ChangedLinesBuilder
 {
     private final Repository repository;
+    private boolean includeModified = true;
+    private boolean includeAdded = true;
 
     public ChangedLinesBuilder(String repoFolder) throws Exception
     {
@@ -52,12 +54,12 @@ public class ChangedLinesBuilder
             boolean isRelevantFile = diff.getNewPath().endsWith(".java");
             if (isRelevantFile)
             {
-                if (isModified(diff))
+                if (includeModified && isModified(diff))
                 {
                     Map<Integer, String> lines = process(diff);
                     changedLines.addFile(diff.getNewPath(), lines);
                 }
-                else if (isAdd(diff))
+                else if (includeAdded && isAdded(diff))
                 {
                     Map<Integer, String> lines = createLines(load(diff.getNewId()));
                     changedLines.addFile(diff.getNewPath(), lines);
@@ -67,12 +69,22 @@ public class ChangedLinesBuilder
         return changedLines;
     }
 
+    public void setIncludeModified(boolean includeModified)
+    {
+        this.includeModified = includeModified;
+    }
+
+    public void setIncludeAdded(boolean includeAdded)
+    {
+        this.includeAdded = includeAdded;
+    }
+
     private boolean isModified(DiffEntry diff)
     {
         return diff.getChangeType() == ChangeType.MODIFY;
     }
 
-    private boolean isAdd(DiffEntry diff)
+    private boolean isAdded(DiffEntry diff)
     {
         return diff.getChangeType() == ChangeType.ADD;
     }
